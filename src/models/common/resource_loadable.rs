@@ -81,7 +81,7 @@ where
                                 Box::new(result),
                             ))
                         })
-                        .boxed_local(),
+                        .boxed(),
                 )
             } else {
                 Effects::none().unchanged()
@@ -159,7 +159,7 @@ where
                                         Box::new(result),
                                     ))
                                 })
-                                .boxed_local()
+                                .boxed()
                                 .into(),
                         )
                     })

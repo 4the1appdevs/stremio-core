@@ -262,7 +262,7 @@ fn push_addons_to_api<E: Env + 'static>(addons: Vec<Descriptor>, auth_key: &Auth
                 source: Box::new(Event::AddonsPushedToAPI { transport_urls }),
             }),
         })
-        .boxed_local()
+        .boxed()
         .into()
 }
 
@@ -279,7 +279,7 @@ fn pull_addons_from_api<E: Env + 'static>(auth_key: &AuthKey) -> Effect {
         })
         .map_ok(|CollectionResponse { addons, .. }| addons)
         .map(move |result| Msg::Internal(Internal::AddonsAPIResult(request, result)))
-        .boxed_local()
+        .boxed()
         .into()
 }
 
@@ -292,6 +292,6 @@ fn push_profile_to_storage<E: Env + 'static>(profile: &Profile) -> Effect {
                 source: Box::new(Event::ProfilePushedToStorage { uid }),
             })
         }))
-        .boxed_local()
+        .boxed()
         .into()
 }

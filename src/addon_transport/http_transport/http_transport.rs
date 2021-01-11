@@ -33,7 +33,7 @@ impl<E: Env> AddonTransport for AddonHTTPTransport<E> {
                 "addon http transport url must ends with {}",
                 ADDON_MANIFEST_PATH
             )))
-            .boxed_local();
+            .boxed();
         }
         let path = if path.extra.is_empty() {
             format!(

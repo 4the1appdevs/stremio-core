@@ -8,7 +8,7 @@ pub fn fetch_api<E, REQ, RESP>(api_request: &REQ) -> EnvFuture<APIResult<RESP>>
 where
     E: Env,
     REQ: APIMethodName + Clone + Serialize,
-    for<'de> RESP: Deserialize<'de> + 'static,
+    for<'de> RESP: Deserialize<'de> + Send + 'static,
 {
     let url = API_URL
         .join("api/")

@@ -12,12 +12,12 @@ impl UnsupportedTransport {
     pub fn new(transport_url: Url) -> Self {
         UnsupportedTransport { transport_url }
     }
-    fn result<T: 'static>(&self) -> EnvFuture<T> {
+    fn result<T: Send + 'static>(&self) -> EnvFuture<T> {
         future::err(EnvError::AddonTransport(format!(
             "Unsupported addon transport: {}",
             self.transport_url.scheme()
         )))
-        .boxed_local()
+        .boxed()
     }
 }
 

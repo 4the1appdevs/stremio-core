@@ -21,7 +21,7 @@ fn actionctx_authenticate_login() {
     struct TestModel {
         ctx: Ctx<TestEnv>,
     }
-    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
         match request {
             Request {
                 url, method, body, ..
@@ -46,7 +46,7 @@ fn actionctx_authenticate_login() {
                             },
                         }
                     },
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             Request {
                 url, method, body, ..
@@ -59,7 +59,7 @@ fn actionctx_authenticate_login() {
                         addons: vec![],
                         last_modified: TestEnv::now(),
                     },
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             Request {
                 url, method, body, ..
@@ -69,7 +69,7 @@ fn actionctx_authenticate_login() {
             {
                 future::ok(Box::new(APIResult::Ok {
                     result: Vec::<LibraryItem>::new(),
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             _ => default_fetch_handler(request),
         }
@@ -210,7 +210,7 @@ fn actionctx_authenticate_register() {
     struct TestModel {
         ctx: Ctx<TestEnv>,
     }
-    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
         match request {
             Request {
                 url, method, body, ..
@@ -235,7 +235,7 @@ fn actionctx_authenticate_register() {
                             },
                         }
                     },
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             Request {
                 url, method, body, ..
@@ -248,7 +248,7 @@ fn actionctx_authenticate_register() {
                         addons: vec![],
                         last_modified: TestEnv::now(),
                     },
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             Request {
                 url, method, body, ..
@@ -258,7 +258,7 @@ fn actionctx_authenticate_register() {
             {
                 future::ok(Box::new(APIResult::Ok {
                     result: Vec::<LibraryItem>::new(),
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             _ => default_fetch_handler(request),
         }

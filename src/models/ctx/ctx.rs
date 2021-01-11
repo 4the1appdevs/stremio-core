@@ -157,7 +157,7 @@ fn authenticate<E: Env + 'static>(auth_request: &AuthRequest) -> Effect {
         .map(enclose!((auth_request) move |result| {
             Msg::Internal(Internal::CtxAuthResult(auth_request, result))
         }))
-        .boxed_local()
+        .boxed()
         .into()
 }
 
@@ -177,6 +177,6 @@ fn delete_session<E: Env + 'static>(auth_key: &AuthKey) -> Effect {
             source: Box::new(Event::SessionDeleted { auth_key }),
         }),
     }))
-    .boxed_local()
+    .boxed()
     .into()
 }

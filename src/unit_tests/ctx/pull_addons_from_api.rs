@@ -76,7 +76,7 @@ fn actionctx_pulladdonsfromapi_with_user() {
     struct TestModel {
         ctx: Ctx<TestEnv>,
     }
-    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
         match request {
             Request {
                 url, method, body, ..
@@ -89,7 +89,7 @@ fn actionctx_pulladdonsfromapi_with_user() {
                         addons: OFFICIAL_ADDONS.to_owned(),
                         last_modified: TestEnv::now(),
                     },
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             _ => default_fetch_handler(request),
         }

@@ -127,7 +127,7 @@ fn actionctx_synclibrarywithapi_with_user() {
             behavior_hints: Default::default(),
         };
     }
-    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
         match &request {
             Request {
                 url, method, body, ..
@@ -150,8 +150,8 @@ fn actionctx_synclibrarywithapi_with_user() {
                             REMOTE_NEWER_ITEM.mtime.to_owned(),
                         ),
                     ],
-                }) as Box<dyn Any>)
-                .boxed_local()
+                }) as Box<dyn Any + Send>)
+                .boxed()
             }
             Request {
                 url, method, body, ..
@@ -174,8 +174,8 @@ fn actionctx_synclibrarywithapi_with_user() {
                     {
                         future::ok(Box::new(APIResult::Ok {
                             result: SuccessResponse { success: True {} },
-                        }) as Box<dyn Any>)
-                        .boxed_local()
+                        }) as Box<dyn Any + Send>)
+                        .boxed()
                     }
                     _ => default_fetch_handler(request),
                 }
@@ -202,8 +202,8 @@ fn actionctx_synclibrarywithapi_with_user() {
                     {
                         future::ok(Box::new(APIResult::Ok {
                             result: vec![REMOTE_ONLY_ITEM.to_owned(), REMOTE_NEWER_ITEM.to_owned()],
-                        }) as Box<dyn Any>)
-                        .boxed_local()
+                        }) as Box<dyn Any + Send>)
+                        .boxed()
                     }
                     _ => default_fetch_handler(request),
                 }
@@ -344,7 +344,7 @@ fn actionctx_synclibrarywithapi_with_user_empty_library() {
     struct TestModel {
         ctx: Ctx<TestEnv>,
     }
-    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
         match &request {
             Request {
                 url, method, body, ..
@@ -354,8 +354,8 @@ fn actionctx_synclibrarywithapi_with_user_empty_library() {
             {
                 future::ok(Box::new(APIResult::Ok {
                     result: Vec::<LibraryItemModified>::new(),
-                }) as Box<dyn Any>)
-                .boxed_local()
+                }) as Box<dyn Any + Send>)
+                .boxed()
             }
             _ => default_fetch_handler(request),
         }

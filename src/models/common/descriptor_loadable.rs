@@ -45,7 +45,7 @@ pub fn descriptor_update<E: Env + 'static>(
                         .map(move |result| {
                             Msg::Internal(Internal::ManifestRequestResult(transport_url, result))
                         })
-                        .boxed_local(),
+                        .boxed(),
                 )
             } else {
                 Effects::none().unchanged()

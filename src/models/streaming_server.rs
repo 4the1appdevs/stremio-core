@@ -148,7 +148,7 @@ fn get_settings<E: Env + 'static>(url: &Url) -> Effect {
                 url, result,
             ))
         }))
-        .boxed_local()
+        .boxed()
         .into()
 }
 
@@ -167,7 +167,7 @@ fn get_base_url<E: Env + 'static>(url: &Url) -> Effect {
         .map(enclose!((url) move |result|
             Msg::Internal(Internal::StreamingServerBaseURLResult(url, result))
         ))
-        .boxed_local()
+        .boxed()
         .into()
 }
 
@@ -204,6 +204,6 @@ fn set_settings<E: Env + 'static>(url: &Url, settings: &Settings) -> Effect {
                 url, result,
             ))
         }))
-        .boxed_local()
+        .boxed()
         .into()
 }

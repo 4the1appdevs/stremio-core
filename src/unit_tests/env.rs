@@ -17,7 +17,8 @@ lazy_static! {
     pub static ref NOW: RwLock<DateTime<Utc>> = RwLock::new(Utc::now());
 }
 
-pub type FetchHandler = Box<dyn Fn(Request) -> EnvFuture<Box<dyn Any>> + Send + Sync + 'static>;
+pub type FetchHandler =
+    Box<dyn Fn(Request) -> EnvFuture<Box<dyn Any + Send>> + Send + Sync + 'static>;
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct Request {
@@ -63,17 +64,17 @@ impl Env for TestEnv {
     fn fetch<IN, OUT>(request: http::Request<IN>) -> EnvFuture<OUT>
     where
         IN: Serialize,
-        for<'de> OUT: Deserialize<'de> + 'static,
+        for<'de> OUT: Deserialize<'de> + Send + 'static,
     {
         let request = Request::from(request);
         REQUESTS.write().unwrap().push(request.to_owned());
         FETCH_HANDLER.read().unwrap()(request)
             .map_ok(|resp| *resp.downcast::<OUT>().unwrap())
-            .boxed_local()
+            .boxed()
     }
     fn get_storage<T>(key: &str) -> EnvFuture<Option<T>>
     where
-        for<'de> T: Deserialize<'de> + 'static,
+        for<'de> T: Deserialize<'de> + Send + 'static,
     {
         future::ok(
             STORAGE
@@ -82,7 +83,7 @@ impl Env for TestEnv {
                 .get(key)
                 .map(|data| serde_json::from_str(&data).unwrap()),
         )
-        .boxed_local()
+        .boxed()
     }
     fn set_storage<T: Serialize>(key: &str, value: Option<&T>) -> EnvFuture<()> {
         let mut storage = STORAGE.write().unwrap();
@@ -90,7 +91,7 @@ impl Env for TestEnv {
             Some(v) => storage.insert(key.to_string(), serde_json::to_string(v).unwrap()),
             None => storage.remove(key),
         };
-        future::ok(()).boxed_local()
+        future::ok(()).boxed()
     }
     fn exec<F>(future: F)
     where
@@ -106,6 +107,6 @@ impl Env for TestEnv {
     }
 }
 
-pub fn default_fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+pub fn default_fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
     panic!("Unhandled fetch request: {:#?}", request)
 }

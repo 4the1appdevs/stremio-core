@@ -4,7 +4,7 @@ use crate::constants::{
     SCHEMA_VERSION_STORAGE_KEY,
 };
 use chrono::{DateTime, Utc};
-use futures::future::LocalBoxFuture;
+use futures::future::BoxFuture;
 use futures::{future, Future, FutureExt, TryFutureExt};
 use http::Request;
 use serde::ser::SerializeStruct;
@@ -69,16 +69,16 @@ impl From<serde_json::Error> for EnvError {
     }
 }
 
-pub type EnvFuture<T> = LocalBoxFuture<'static, Result<T, EnvError>>;
+pub type EnvFuture<T> = BoxFuture<'static, Result<T, EnvError>>;
 
 pub trait Env {
     fn fetch<IN, OUT>(request: Request<IN>) -> EnvFuture<OUT>
     where
         IN: Serialize,
-        for<'de> OUT: Deserialize<'de> + 'static;
+        for<'de> OUT: Deserialize<'de> + Send + 'static;
     fn get_storage<T>(key: &str) -> EnvFuture<Option<T>>
     where
-        for<'de> T: Deserialize<'de> + 'static;
+        for<'de> T: Deserialize<'de> + Send + 'static;
     fn set_storage<T: Serialize>(key: &str, value: Option<&T>) -> EnvFuture<()>;
     fn exec<F>(future: F)
     where
@@ -128,7 +128,7 @@ pub trait Env {
                 };
                 Ok(())
             })
-            .boxed_local()
+            .boxed()
     }
 }
 
@@ -140,7 +140,7 @@ fn migrate_storage_schema_to_v1<E: Env>() -> EnvFuture<()> {
         E::set_storage::<()>(LIBRARY_STORAGE_KEY, None),
     ])
     .map_ok(|_| ())
-    .boxed_local()
+    .boxed()
 }
 
 fn migrate_storage_schema_to_v2<E: Env>() -> EnvFuture<()> {
@@ -210,5 +210,5 @@ fn migrate_storage_schema_to_v2<E: Env>() -> EnvFuture<()> {
             }
         })
         .and_then(|_| E::set_storage(SCHEMA_VERSION_STORAGE_KEY, Some(&2)))
-        .boxed_local()
+        .boxed()
 }

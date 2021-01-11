@@ -95,7 +95,7 @@ fn actionctx_uninstalladdon_with_user() {
     struct TestModel {
         ctx: Ctx<TestEnv>,
     }
-    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any>> {
+    fn fetch_handler(request: Request) -> EnvFuture<Box<dyn Any + Send>> {
         match request {
             Request {
                 url, method, body, ..
@@ -105,7 +105,7 @@ fn actionctx_uninstalladdon_with_user() {
             {
                 future::ok(Box::new(APIResult::Ok {
                     result: SuccessResponse { success: True {} },
-                }) as Box<dyn Any>).boxed_local()
+                }) as Box<dyn Any + Send>).boxed()
             }
             _ => default_fetch_handler(request),
         }

@@ -1,8 +1,8 @@
 use crate::runtime::msg::Msg;
 use derive_more::{From, IntoIterator};
-use futures::future::LocalBoxFuture;
+use futures::future::BoxFuture;
 
-pub type EffectFuture = LocalBoxFuture<'static, Msg>;
+pub type EffectFuture = BoxFuture<'static, Msg>;
 
 #[derive(From)]
 pub enum Effect {
